@@ -22,46 +22,58 @@ export const useCpuPlayer = (enabled: boolean = true) => {
       return;
     }
 
-    // プレイヤーBがCPUかつ連鎖中でない場合に行動
-    const playerB = gameState.players.B;
-    if (playerB && 
-        playerB.type === PlayerType.CPU_WEAK && 
-        playerB.fallingPuyo && 
-        !playerB.isChaining) {
-      
-      // CPUの思考タイマー
-      thinkingTimeoutRef.current = window.setTimeout(async () => {
-        try {
-          const response = await apiClient.getCpuAction({
-            game_state: {
-              players: {
-                B: {
-                  board: playerB.board,
-                  current_puyo: {
-                    colors: playerB.fallingPuyo!.colors,
-                    x: playerB.fallingPuyo!.x,
-                    y: playerB.fallingPuyo!.y,
-                    rotation: playerB.fallingPuyo!.rotation
+    // CPUプレイヤーの行動処理
+    const processCpuPlayer = async (player: any, playerId: 'A' | 'B') => {
+      if (player && 
+          (player.type === PlayerType.CPU_WEAK || player.type === PlayerType.DQN) && 
+          player.fallingPuyo && 
+          !player.isChaining) {
+        
+        // CPUの思考タイマー
+        thinkingTimeoutRef.current = window.setTimeout(async () => {
+          try {
+            const response = await apiClient.getCpuAction({
+              game_state: {
+                players: {
+                  [playerId]: {
+                    board: player.board,
+                    current_puyo: {
+                      colors: player.fallingPuyo!.colors,
+                      x: player.fallingPuyo!.x,
+                      y: player.fallingPuyo!.y,
+                      rotation: player.fallingPuyo!.rotation
+                    }
                   }
                 }
-              }
-            },
-            player_id: "B",
-            cpu_type: "weak"
-          });
+              },
+              player_id: playerId,
+              cpu_type: player.type === PlayerType.DQN ? "dqn" : "weak"
+            });
 
-          // CPU行動を適用
-          if (response.action && response.action !== 'no_action') {
-            applyAction('B', response.action);
+            // CPU行動を適用
+            if (response.action && response.action !== 'no_action') {
+              applyAction(playerId, response.action);
+            }
+          } catch (error) {
+            console.error(`CPU action failed for player ${playerId}:`, error);
+            // フォールバック: ランダム行動
+            const actions = ['move_left', 'move_right', 'rotate_right', 'soft_drop'];
+            const randomAction = actions[Math.floor(Math.random() * actions.length)];
+            applyAction(playerId, randomAction);
           }
-        } catch (error) {
-          console.error('CPU action failed:', error);
-          // フォールバック: ランダム行動
-          const actions = ['move_left', 'move_right', 'rotate_right', 'soft_drop'];
-          const randomAction = actions[Math.floor(Math.random() * actions.length)];
-          applyAction('B', randomAction);
-        }
-      }, CPU_THINK_DELAY);
+        }, CPU_THINK_DELAY);
+      }
+    };
+
+    // プレイヤーA・Bをチェック
+    const playerA = gameState.players.A;
+    const playerB = gameState.players.B;
+    
+    // いずれかのプレイヤーがCPUの場合に処理
+    if (playerA && (playerA.type === PlayerType.CPU_WEAK || playerA.type === PlayerType.DQN)) {
+      processCpuPlayer(playerA, 'A');
+    } else if (playerB && (playerB.type === PlayerType.CPU_WEAK || playerB.type === PlayerType.DQN)) {
+      processCpuPlayer(playerB, 'B');
     }
 
     return () => {

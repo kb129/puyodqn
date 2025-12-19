@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+.venv/
+venv/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Tests and development
+tests/
+test_*.py
+*_test.py
+
+# Logs
+logs/
+*.log
+
+# Development files
+requirements.txt
+.python-version
+
+# Large files that might be in models (if any)
+models/*.pth
+models/*.pt
+models/*.pkl
+
+# Temporary files
+tmp/
+temp/

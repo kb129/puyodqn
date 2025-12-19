@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { AppState, PlayerType, Color } from "../types/game";
-import type { GameState, PlayerState, PuyoPair, InputState } from "../types/game";
+import { AppState, PlayerType, Color, TrainingMode } from "../types/game";
+import type { GameState, PlayerState, PuyoPair, InputState, TrainingConfig, TrainingStatus, TrainingResults } from "../types/game";
 
 interface GameStore {
   appState: AppState;
@@ -8,6 +8,12 @@ interface GameStore {
   inputState: InputState;
   playerAType: PlayerType;
   playerBType: PlayerType;
+  
+  // 学習関連状態
+  trainingMode: TrainingMode | null;
+  trainingConfig: TrainingConfig | null;
+  trainingStatus: TrainingStatus | null;
+  trainingResults: TrainingResults | null;
   
   setAppState: (state: AppState) => void;
   setPlayerTypes: (playerA: PlayerType, playerB: PlayerType) => void;
@@ -20,6 +26,13 @@ interface GameStore {
   resumeGame: () => void;
   endGame: (winner?: "A" | "B") => void;
   resetGame: () => void;
+  
+  // 学習関連アクション
+  setTrainingMode: (mode: TrainingMode) => void;
+  startTraining: (config: TrainingConfig) => void;
+  stopTraining: () => void;
+  updateTrainingStatus: (status: TrainingStatus) => void;
+  setTrainingResults: (results: TrainingResults) => void;
 }
 
 const createInitialPlayer = (id: "A" | "B", type: PlayerType): PlayerState => ({
@@ -67,6 +80,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   playerAType: PlayerType.HUMAN,
   playerBType: PlayerType.CPU_WEAK,
+  
+  // 学習関連初期状態
+  trainingMode: null,
+  trainingConfig: null,
+  trainingStatus: null,
+  trainingResults: null,
 
   setAppState: (state: AppState) => {
     set({ appState: state });
@@ -293,6 +312,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pause: false
       }
     });
+  },
+
+  // 学習関連アクション
+  setTrainingMode: (mode: TrainingMode) => {
+    set({ trainingMode: mode });
+  },
+
+  startTraining: (config: TrainingConfig) => {
+    set({ 
+      trainingConfig: config,
+      trainingStatus: {
+        isRunning: true,
+        currentEpisode: 0,
+        totalEpisodes: config.episodes,
+        winRate: 0,
+        averageScore: 0,
+        averageChain: 0,
+        learningProgress: 0,
+        estimatedTimeLeft: 0,
+        lastModelSave: ''
+      }
+    });
+    
+    // 実際の学習開始処理（APIコール等）
+    console.log('Starting training with config:', config);
+    // TODO: バックエンドAPI呼び出し
+  },
+
+  stopTraining: () => {
+    const { trainingStatus } = get();
+    if (trainingStatus) {
+      // 学習結果を生成
+      const results: TrainingResults = {
+        finalWinRate: trainingStatus.winRate,
+        bestScore: trainingStatus.averageScore,
+        maxChain: Math.floor(trainingStatus.averageChain),
+        totalGames: trainingStatus.currentEpisode,
+        trainingTime: Date.now(), // 実際は開始時刻との差分
+        modelPath: `/models/dqn-${Date.now()}.pth`
+      };
+      
+      set({ 
+        trainingStatus: { ...trainingStatus, isRunning: false },
+        trainingResults: results
+      });
+    }
+  },
+
+  updateTrainingStatus: (status: TrainingStatus) => {
+    set({ trainingStatus: status });
+  },
+
+  setTrainingResults: (results: TrainingResults) => {
+    set({ trainingResults: results });
   }
 }));
 

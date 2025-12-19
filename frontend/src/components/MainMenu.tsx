@@ -18,6 +18,10 @@ export const MainMenu: React.FC = () => {
     setAppState(AppState.PLAYER_SELECT);
   };
 
+  const handleTrainingMode = () => {
+    setAppState(AppState.TRAINING_MENU);
+  };
+
   const handleSettings = () => {
     // 未実装
     alert('設定画面は未実装です');
@@ -41,6 +45,13 @@ export const MainMenu: React.FC = () => {
             onClick={handleVersusMode}
           >
             対戦モード
+          </button>
+
+          <button 
+            className="menu-button ai-training"
+            onClick={handleTrainingMode}
+          >
+            AI学習モード
           </button>
           
           <button 

@@ -50,6 +50,7 @@ export const PlayerSelect: React.FC = () => {
             >
               <option value={PlayerType.HUMAN}>人間プレイヤー</option>
               <option value={PlayerType.CPU_WEAK}>無能CPU</option>
+              <option value={PlayerType.DQN}>DQN AI</option>
             </select>
           </div>
 
@@ -65,6 +66,7 @@ export const PlayerSelect: React.FC = () => {
             >
               <option value={PlayerType.HUMAN}>人間プレイヤー</option>
               <option value={PlayerType.CPU_WEAK}>無能CPU</option>
+              <option value={PlayerType.DQN}>DQN AI</option>
             </select>
           </div>
         </div>

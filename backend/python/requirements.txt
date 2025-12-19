@@ -4,3 +4,5 @@ websockets==12.0
 numpy>=1.25.0
 pydantic>=2.8.0
 python-multipart==0.0.6
+torch>=2.0.0
+torchvision>=0.15.0

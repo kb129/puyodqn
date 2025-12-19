@@ -1,0 +1,19 @@
+2025-12-19 18:09:56,417 - __main__ - INFO - Starting DQN training script
+2025-12-19 18:09:56,417 - __main__ - INFO - Arguments: {'episodes': 1000, 'batch_size': 32, 'learning_rate': 0.0001, 'memory_size': 100000, 'epsilon_decay': 50000, 'output_dir': 'models', 'log_dir': 'logs', 'cpu': False, 'resume': None, 'eval_only': False, 'eval_model': None, 'eval_games': 100}
+2025-12-19 18:09:56,417 - __main__ - INFO - Using device: cpu
+2025-12-19 18:09:56,957 - ai.dqn_trainer - INFO - Starting enhanced training for 1000 episodes
+2025-12-19 18:09:56,957 - ai.dqn_trainer - INFO - Running evaluation at episode 0
+2025-12-19 18:09:56,961 - __main__ - INFO - Evaluating against WeakCPU (50 games)...
+2025-12-19 18:10:16,821 - ai.dqn_trainer - INFO - Evaluation Results (Episode 0): Win Rate: 0.080 | Avg Score: 132 | Avg Chain: 0.6
+2025-12-19 18:10:16,910 - ai.dqn_trainer - INFO - Episode      0 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:10:29,257 - ai.dqn_trainer - INFO - Episode    100 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:10:41,268 - ai.dqn_trainer - INFO - Episode    200 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:10:54,379 - ai.dqn_trainer - INFO - Episode    300 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:11:06,235 - ai.dqn_trainer - INFO - Episode    400 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:11:17,971 - ai.dqn_trainer - INFO - Episode    500 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:11:30,618 - ai.dqn_trainer - INFO - Episode    600 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:11:43,868 - ai.dqn_trainer - INFO - Episode    700 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:11:55,017 - ai.dqn_trainer - INFO - Episode    800 | Reward:  10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:11:58,216 - __main__ - INFO - Training interrupted by user
+2025-12-19 18:11:58,231 - ai.dqn_trainer - INFO - Checkpoint saved: models/checkpoint_episode_826.pth
+2025-12-19 18:11:58,231 - __main__ - INFO - Emergency checkpoint saved: models/emergency_checkpoint.pth

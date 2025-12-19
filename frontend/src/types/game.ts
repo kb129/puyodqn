@@ -29,7 +29,8 @@ export type Action = typeof Action[keyof typeof Action];
 // プレイヤータイプ
 export const PlayerType = {
   HUMAN: 'human',
-  CPU_WEAK: 'cpu_weak'
+  CPU_WEAK: 'cpu_weak',
+  DQN: 'dqn'
 } as const;
 
 export type PlayerType = typeof PlayerType[keyof typeof PlayerType];
@@ -40,6 +41,10 @@ export const AppState = {
   PLAYER_SELECT: 'player_select',
   GAME_SINGLE: 'game_single', 
   GAME_VERSUS: 'game_versus',
+  TRAINING_MENU: 'training_menu',      // 学習メニュー
+  TRAINING_CONFIG: 'training_config',  // 学習設定
+  TRAINING_ACTIVE: 'training_active',  // 学習実行中
+  TRAINING_RESULTS: 'training_results', // 学習結果表示
   PAUSED: 'paused',
   GAME_OVER: 'game_over'
 } as const;
@@ -148,3 +153,51 @@ export const COLOR_CHARS = {
   [Color.YELLOW]: 'Y',
   [Color.OJAMA]: '×'
 } as const;
+
+// 学習モード定義
+export const TrainingMode = {
+  SELF_PLAY: 'self_play',           // 自己対戦学習
+  VS_CPU: 'vs_cpu',                 // 対CPU学習
+  TOURNAMENT: 'tournament',         // AIトーナメント
+  EVALUATION: 'evaluation'          // 性能評価
+} as const;
+
+export type TrainingMode = typeof TrainingMode[keyof typeof TrainingMode];
+
+// 学習設定
+export interface TrainingConfig {
+  mode: TrainingMode;
+  episodes: number;                 // エピソード数
+  speedMultiplier: number;          // ゲーム速度倍率
+  saveInterval: number;             // モデル保存間隔
+  evalInterval: number;             // 評価実行間隔
+  learningRate: number;             // 学習率
+  epsilon: number;                  // 探索率
+  batchSize: number;                // バッチサイズ
+  memorySize: number;               // リプレイメモリサイズ
+  targetUpdate: number;             // ターゲットネット更新頻度
+}
+
+// 学習ステータス
+export interface TrainingStatus {
+  isRunning: boolean;               // 学習実行中フラグ
+  currentEpisode: number;           // 現在のエピソード
+  totalEpisodes: number;            // 総エピソード数
+  winRate: number;                  // 勝率
+  averageScore: number;             // 平均スコア
+  averageChain: number;             // 平均連鎖数
+  learningProgress: number;         // 学習進捗(0-100%)
+  estimatedTimeLeft: number;        // 推定残り時間(秒)
+  lastModelSave: string;            // 最後のモデル保存時刻
+}
+
+// 学習結果
+export interface TrainingResults {
+  finalWinRate: number;             // 最終勝率
+  bestScore: number;                // 最高スコア
+  maxChain: number;                 // 最大連鎖数
+  totalGames: number;               // 総ゲーム数
+  trainingTime: number;             // 学習時間(秒)
+  convergenceEpisode?: number;      // 収束エピソード
+  modelPath: string;                // 保存されたモデルパス
+}

@@ -1,0 +1,15 @@
+2025-12-19 18:03:46,105 - __main__ - INFO - Starting DQN training script
+2025-12-19 18:03:46,105 - __main__ - INFO - Arguments: {'episodes': 1000, 'batch_size': 32, 'learning_rate': 0.0001, 'memory_size': 100000, 'epsilon_decay': 50000, 'output_dir': 'models', 'log_dir': 'logs', 'cpu': False, 'resume': None, 'eval_only': False, 'eval_model': None, 'eval_games': 100}
+2025-12-19 18:03:46,105 - __main__ - INFO - Using device: cpu
+2025-12-19 18:03:46,599 - ai.dqn_trainer - INFO - Starting enhanced training for 1000 episodes
+2025-12-19 18:03:46,599 - ai.dqn_trainer - INFO - Running evaluation at episode 0
+2025-12-19 18:03:46,603 - __main__ - INFO - Evaluating against WeakCPU (50 games)...
+2025-12-19 18:03:54,368 - ai.dqn_trainer - INFO - Evaluation Results (Episode 0): Win Rate: 0.140 | Avg Score: 94 | Avg Chain: 0.5
+2025-12-19 18:03:54,390 - ai.dqn_trainer - INFO - Episode      0 | Reward:  10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:04:05,466 - ai.dqn_trainer - INFO - Episode    100 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:04:18,593 - ai.dqn_trainer - INFO - Episode    200 | Reward:  10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:04:31,401 - ai.dqn_trainer - INFO - Episode    300 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:04:43,987 - ai.dqn_trainer - INFO - Episode    400 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:04:56,106 - ai.dqn_trainer - INFO - Episode    500 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:05:08,041 - ai.dqn_trainer - INFO - Episode    600 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:05:19,491 - ai.dqn_trainer - INFO - Episode    700 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0

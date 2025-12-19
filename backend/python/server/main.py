@@ -10,6 +10,8 @@ import asyncio
 
 from game_state.game_state import GameState
 from ai.weak_cpu import WeakCPU
+from ai.dqn_player import DQNPlayer
+from ai.base_player import BasePlayer
 
 app = FastAPI(title="PuyoDQN Backend API", version="1.0.0")
 
@@ -24,7 +26,32 @@ app.add_middleware(
 
 # グローバル状態
 active_connections: Dict[str, WebSocket] = {}
-ai_players: Dict[str, WeakCPU] = {}
+ai_players: Dict[str, BasePlayer] = {}
+
+# DQNモデルのパス設定
+DEFAULT_DQN_MODEL_PATH = "models/best_model.pth"
+
+def create_ai_player(player_id: str, cpu_type: str, model_path: Optional[str] = None) -> BasePlayer:
+    """AIプレイヤーを作成"""
+    if cpu_type == "weak":
+        return WeakCPU(player_id)
+    elif cpu_type == "dqn":
+        model_file = model_path or DEFAULT_DQN_MODEL_PATH
+        try:
+            # ファイルが存在しない場合はWeakCPUにフォールバック
+            import os
+            if not os.path.exists(model_file):
+                print(f"Warning: DQN model not found at {model_file}, using WeakCPU instead")
+                return WeakCPU(player_id)
+            
+            dqn_player = DQNPlayer(player_id, model_path=model_file)
+            dqn_player.epsilon = 0.0  # 評価モード（探索なし）
+            return dqn_player
+        except Exception as e:
+            print(f"Error loading DQN player: {e}, using WeakCPU instead")
+            return WeakCPU(player_id)
+    else:
+        raise ValueError(f"Unknown CPU type: {cpu_type}")
 
 class GameStateRequest(BaseModel):
     """ゲーム状態リクエスト"""
@@ -38,7 +65,8 @@ class ActionRequest(BaseModel):
     """行動リクエスト"""
     game_state: dict
     player_id: str
-    cpu_type: str = "weak"
+    cpu_type: str = "weak"  # "weak", "dqn"
+    model_path: Optional[str] = None
 
 class ApiMessage(BaseModel):
     """API メッセージ基本形式"""
@@ -59,8 +87,59 @@ async def health_check():
         "status": "healthy",
         "version": "1.0.0",
         "active_connections": len(active_connections),
+        "active_ai_players": len(ai_players),
         "uptime": time.time()
     }
+
+@app.get("/api/ai/players")
+async def list_ai_players():
+    """アクティブなAIプレイヤー一覧"""
+    players_info = []
+    for key, player in ai_players.items():
+        players_info.append({
+            "key": key,
+            "player_id": player.player_id,
+            "name": player.name,
+            "type": "DQN" if isinstance(player, DQNPlayer) else "CPU"
+        })
+    
+    return {"players": players_info}
+
+@app.delete("/api/ai/players/{player_key}")
+async def remove_ai_player(player_key: str):
+    """AIプレイヤーを削除"""
+    if player_key in ai_players:
+        del ai_players[player_key]
+        return {"message": f"Player {player_key} removed"}
+    else:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+@app.get("/api/ai/models")
+async def list_available_models():
+    """利用可能なモデル一覧"""
+    import os
+    import glob
+    
+    models_dir = "models"
+    if not os.path.exists(models_dir):
+        return {"models": []}
+    
+    model_files = glob.glob(os.path.join(models_dir, "*.pth"))
+    models_info = []
+    
+    for model_file in model_files:
+        file_stat = os.stat(model_file)
+        models_info.append({
+            "filename": os.path.basename(model_file),
+            "path": model_file,
+            "size": file_stat.st_size,
+            "modified": file_stat.st_mtime
+        })
+    
+    # 更新日時でソート
+    models_info.sort(key=lambda x: x["modified"], reverse=True)
+    
+    return {"models": models_info}
 
 @app.post("/api/cpu/action")
 async def get_cpu_action(request: ActionRequest):
@@ -69,7 +148,7 @@ async def get_cpu_action(request: ActionRequest):
         # CPU プレイヤー取得または作成
         cpu_key = f"{request.player_id}_{request.cpu_type}"
         if cpu_key not in ai_players:
-            ai_players[cpu_key] = WeakCPU(request.player_id)
+            ai_players[cpu_key] = create_ai_player(request.player_id, request.cpu_type, request.model_path)
         
         cpu = ai_players[cpu_key]
         
@@ -78,10 +157,16 @@ async def get_cpu_action(request: ActionRequest):
         action = cpu.get_action(request.game_state)
         thinking_time = int((time.time() - start_time) * 1000)
         
+        # デバッグ情報（WeakCPUのみ）
+        debug_info = {}
+        if hasattr(cpu, 'get_debug_info'):
+            debug_info = cpu.get_debug_info(request.game_state)
+        
         return {
             "action": action,
             "thinking_time": thinking_time,
-            "debug_info": cpu.get_debug_info(request.game_state)
+            "debug_info": debug_info,
+            "cpu_type": request.cpu_type
         }
         
     except Exception as e:
@@ -170,6 +255,7 @@ async def handle_cpu_action_request(message_id: str, payload: dict, player_id: s
     game_state = payload.get("game_state")
     cpu_type = payload.get("cpu_type", "weak")
     target_player = payload.get("player_id", player_id)
+    model_path = payload.get("model_path")
     
     if not game_state:
         raise ValueError("game_state is required")
@@ -177,18 +263,22 @@ async def handle_cpu_action_request(message_id: str, payload: dict, player_id: s
     # CPU プレイヤー取得または作成
     cpu_key = f"{target_player}_{cpu_type}"
     if cpu_key not in ai_players:
-        if cpu_type == "weak":
-            ai_players[cpu_key] = WeakCPU(target_player)
-        else:
-            raise ValueError(f"Unknown CPU type: {cpu_type}")
+        ai_players[cpu_key] = create_ai_player(target_player, cpu_type, model_path)
     
     cpu = ai_players[cpu_key]
     
     # 行動決定（少し遅延を入れて人間らしくする）
     start_time = time.time()
-    await asyncio.sleep(0.05)  # 50ms の遅延
+    if cpu_type == "weak":
+        await asyncio.sleep(0.05)  # 50ms の遅延（WeakCPU用）
+    
     action = cpu.get_action(game_state)
     thinking_time = int((time.time() - start_time) * 1000)
+    
+    # デバッグ情報（WeakCPUのみ）
+    debug_info = {}
+    if hasattr(cpu, 'get_debug_info'):
+        debug_info = cpu.get_debug_info(game_state)
     
     return {
         "id": message_id,
@@ -196,7 +286,8 @@ async def handle_cpu_action_request(message_id: str, payload: dict, player_id: s
         "payload": {
             "action": action,
             "thinking_time": thinking_time,
-            "debug_info": cpu.get_debug_info(game_state)
+            "debug_info": debug_info,
+            "cpu_type": cpu_type
         },
         "timestamp": int(time.time())
     }

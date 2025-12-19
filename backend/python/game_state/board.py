@@ -98,10 +98,30 @@ class Board:
         
         return chains
     
+    def find_adjacent_ojama(self, color_positions: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
+        """色付きぷよに隣接するおじゃまぷよを検出"""
+        ojama_positions = set()
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        
+        for x, y in color_positions:
+            for dx, dy in directions:
+                nx, ny = x + dx, y + dy
+                if (0 <= nx < BOARD_WIDTH and 0 <= ny < BOARD_HEIGHT and 
+                    self.grid[ny][nx] == Color.OJAMA):
+                    ojama_positions.add((nx, ny))
+        
+        return ojama_positions
+    
     def remove_puyos(self, positions: Set[Tuple[int, int]]) -> int:
-        """指定位置のぷよを消去"""
+        """指定位置のぷよを消去（隣接おじゃまぷよも含む）"""
+        # まず隣接するおじゃまぷよを検出
+        adjacent_ojama = self.find_adjacent_ojama(positions)
+        
+        # 色付きぷよとおじゃまぷよを合わせて消去
+        all_positions = positions | adjacent_ojama
+        
         count = 0
-        for x, y in positions:
+        for x, y in all_positions:
             if self.grid[y][x] != Color.EMPTY:
                 self.grid[y][x] = Color.EMPTY
                 count += 1

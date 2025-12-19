@@ -52,3 +52,23 @@
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+.menu-button.ai-training {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-button.ai-training:hover {
+  background: linear-gradient(45deg, #ff7979, #fd79a8);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 6px 12px rgba(255, 107, 107, 0.3);
+  }
+  to {
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+  }
+}

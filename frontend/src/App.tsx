@@ -2,6 +2,10 @@ import { useGameStore } from './store/gameStore';
 import { AppState } from './types/game';
 import { MainMenu } from './components/MainMenu';
 import { PlayerSelect } from './components/PlayerSelect';
+import { TrainingMenu } from './components/TrainingMenu';
+import { TrainingConfig } from './components/TrainingConfig';
+import { TrainingActive } from './components/TrainingActive';
+import { TrainingResults } from './components/TrainingResults';
 import { GameBoard } from './components/GameBoard';
 import { NextDisplay } from './components/NextDisplay';
 import { OjamaPreview } from './components/OjamaPreview';
@@ -36,6 +40,18 @@ function App() {
       
       case AppState.PLAYER_SELECT:
         return <PlayerSelect />;
+      
+      case AppState.TRAINING_MENU:
+        return <TrainingMenu />;
+      
+      case AppState.TRAINING_CONFIG:
+        return <TrainingConfig />;
+      
+      case AppState.TRAINING_ACTIVE:
+        return <TrainingActive />;
+      
+      case AppState.TRAINING_RESULTS:
+        return <TrainingResults />;
       
       case AppState.GAME_SINGLE:
         if (!gameState) return <MainMenu />;

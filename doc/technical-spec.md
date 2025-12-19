@@ -35,11 +35,138 @@
 #### バックエンド  
 ```yaml
 言語: Python 3.11+
+パッケージマネージャー: uv (ultra-fast Python package manager)
 フレームワーク: FastAPI
+Webサーバー: Uvicorn
 通信: WebSocket + HTTP
 データ処理: NumPy
-機械学習: PyTorch (将来)
+機械学習: PyTorch
 テスト: pytest
+リンター: Black + isort
+```
+
+#### 開発・デプロイツール
+```yaml
+フロントエンド:
+  - Node.js + npm
+  - Vite (開発サーバー・ビルド)
+  - TypeScript コンパイラ
+  
+バックエンド:
+  - uv (依存関係管理・仮想環境)
+  - Docker + Docker Compose
+  - uvicorn (ASGI サーバー)
+  
+共通:
+  - Git (バージョン管理)
+  - GitHub (リポジトリ・CI/CD)
+```
+
+### なぜuvを採用したか
+
+uvは次世代Pythonパッケージマネージャーで、以下の利点があります：
+
+#### 🚀 **速度**
+- **10-100倍高速**: pip/poetryより圧倒的に高速な依存解決・インストール
+- **並列処理**: 複数パッケージを並行してダウンロード・インストール
+- **キャッシュ最適化**: 効率的なローカルキャッシュシステム
+
+#### 🔒 **信頼性**
+- **ロックファイル**: `uv.lock`で再現可能なビルド保証
+- **依存解決**: より正確で高速な依存関係解決
+- **隔離環境**: 完全に分離された仮想環境
+
+#### 🛠 **開発効率**
+- **シンプルコマンド**: `uv sync`, `uv run`, `uv add`で直感的操作
+- **プロジェクト管理**: `pyproject.toml`ベースの統一設定
+- **クロスプラットフォーム**: Windows/macOS/Linux対応
+
+#### 📦 **現代的設計**
+- **Rustで実装**: メモリ安全で高性能
+- **PEP準拠**: Python標準に完全対応
+- **pip互換**: 既存プロジェクトから簡単移行
+
+```bash
+# 従来のpipワークフロー (遅い)
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt  # 30-60秒
+
+# uvワークフロー (高速)
+uv sync  # 3-5秒
+```
+
+## 🚀 開発環境セットアップ
+
+### 前提条件
+
+```bash
+# 必須
+- Node.js 18+ (フロントエンド)
+- Python 3.11+ (バックエンド)
+- Git
+
+# 推奨
+- uv (Pythonパッケージマネージャー)
+- Docker Desktop (コンテナ実行用)
+```
+
+### 1. プロジェクトのクローン
+
+```bash
+git clone https://github.com/kb129/puyodqn.git
+cd puyodqn
+```
+
+### 2. バックエンドセットアップ
+
+```bash
+cd backend/python
+
+# uv使用（推奨・高速）
+uv sync
+uv run uvicorn server.main:app --reload --port 8000
+
+# 従来方法（uvがない場合）
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python -m uvicorn server.main:app --reload --port 8000
+```
+
+### 3. フロントエンドセットアップ
+
+```bash
+cd frontend
+
+# 依存関係インストール
+npm install
+
+# 開発サーバー起動
+npm run dev
+```
+
+### 4. 動作確認
+
+```bash
+# フロントエンド: http://localhost:5173/
+# バックエンドAPI: http://localhost:8000/
+
+# ヘルスチェック
+curl http://localhost:8000/api/health
+```
+
+### 5. AI学習テスト
+
+```bash
+cd backend/python
+
+# AIコンポーネントテスト
+uv run python test_ai.py
+
+# CLI操作テスト
+uv run python cli.py test
+uv run python cli.py battle weak weak --games 3
 ```
 
 ## データ構造

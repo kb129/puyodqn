@@ -1,0 +1,9 @@
+2025-12-19 18:09:03,452 - __main__ - INFO - Starting DQN training script
+2025-12-19 18:09:03,452 - __main__ - INFO - Arguments: {'episodes': 100, 'batch_size': 32, 'learning_rate': 0.0001, 'memory_size': 100000, 'epsilon_decay': 50000, 'output_dir': 'models', 'log_dir': 'logs', 'cpu': False, 'resume': None, 'eval_only': False, 'eval_model': None, 'eval_games': 100}
+2025-12-19 18:09:03,452 - __main__ - INFO - Using device: cpu
+2025-12-19 18:09:04,054 - ai.dqn_trainer - INFO - Starting enhanced training for 100 episodes
+2025-12-19 18:09:04,057 - ai.dqn_trainer - INFO - Running evaluation at episode 0
+2025-12-19 18:09:04,069 - __main__ - INFO - Evaluating against WeakCPU (50 games)...
+2025-12-19 18:09:11,724 - ai.dqn_trainer - INFO - Evaluation Results (Episode 0): Win Rate: 0.040 | Avg Score: 172 | Avg Chain: 0.9
+2025-12-19 18:09:11,749 - ai.dqn_trainer - INFO - Episode      0 | Reward:  10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:09:24,939 - __main__ - INFO - Training completed successfully

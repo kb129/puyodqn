@@ -1,0 +1,121 @@
+/* AI学習メニュー画面スタイル */
+
+.training-menu {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+}
+
+.menu-container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 800px;
+  width: 100%;
+}
+
+.menu-title {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 2.5em;
+  font-weight: bold;
+}
+
+.menu-description {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+.training-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.training-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.training-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+.training-card h3 {
+  margin-bottom: 10px;
+  font-size: 1.3em;
+  color: #fff;
+}
+
+.training-card p {
+  margin-bottom: 20px;
+  opacity: 0.8;
+  font-size: 0.9em;
+}
+
+.training-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.training-button.primary {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+  color: white;
+}
+
+.training-button.secondary {
+  background: linear-gradient(45deg, #4834d4, #686de0);
+  color: white;
+}
+
+.training-button.tournament {
+  background: linear-gradient(45deg, #ff9ff3, #f368e0);
+  color: white;
+}
+
+.training-button.evaluation {
+  background: linear-gradient(45deg, #54a0ff, #2e86de);
+  color: white;
+}
+
+.training-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

@@ -1,0 +1,22 @@
+[project]
+name = "puyodqn-backend"
+version = "0.1.0"
+description = "PuyoDQN Backend with AI Players"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "websockets>=12.0",
+    "numpy>=1.25.0",
+    "pydantic>=2.8.0",
+    "python-multipart>=0.0.6",
+    "torch>=2.0.0,<3.0.0",
+    "torchvision>=0.15.0,<1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "isort>=5.0.0",
+]

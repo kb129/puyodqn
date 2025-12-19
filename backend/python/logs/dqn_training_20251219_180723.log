@@ -1,0 +1,12 @@
+2025-12-19 18:07:23,037 - __main__ - INFO - Starting DQN training script
+2025-12-19 18:07:23,037 - __main__ - INFO - Arguments: {'episodes': 1000, 'batch_size': 32, 'learning_rate': 0.0001, 'memory_size': 100000, 'epsilon_decay': 50000, 'output_dir': 'models', 'log_dir': 'logs', 'cpu': False, 'resume': None, 'eval_only': False, 'eval_model': None, 'eval_games': 100}
+2025-12-19 18:07:23,037 - __main__ - INFO - Using device: cpu
+2025-12-19 18:07:23,593 - ai.dqn_trainer - INFO - Starting enhanced training for 1000 episodes
+2025-12-19 18:07:23,593 - ai.dqn_trainer - INFO - Running evaluation at episode 0
+2025-12-19 18:07:23,598 - __main__ - INFO - Evaluating against WeakCPU (50 games)...
+2025-12-19 18:07:28,550 - ai.dqn_trainer - INFO - Evaluation Results (Episode 0): Win Rate: 0.040 | Avg Score: 16 | Avg Chain: 0.1
+2025-12-19 18:07:28,670 - ai.dqn_trainer - INFO - Episode      0 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:07:40,671 - ai.dqn_trainer - INFO - Episode    100 | Reward: -10.0000 | Loss:   0.0000 | Epsilon: 1.0000 | Memory:      0
+2025-12-19 18:07:45,612 - __main__ - INFO - Training interrupted by user
+2025-12-19 18:07:45,624 - ai.dqn_trainer - INFO - Checkpoint saved: models/checkpoint_episode_141.pth
+2025-12-19 18:07:45,624 - __main__ - INFO - Emergency checkpoint saved: models/emergency_checkpoint.pth
