@@ -1,0 +1,79 @@
+.ojama-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 1rem;
+  min-height: 2rem;
+  font-family: 'Courier New', monospace;
+}
+
+.ojama-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #ddd;
+  white-space: nowrap;
+}
+
+.ojama-display {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 2px;
+  min-width: 100px;
+}
+
+.ojama-count {
+  font-size: 0.8rem;
+  color: #bbb;
+  font-style: italic;
+}
+
+/* おじゃまぷよアイコンの色分け */
+.ojama-display::before {
+  content: '';
+}
+
+/* プレイヤー別スタイル */
+.ojama-preview.player-a {
+  justify-content: flex-start;
+}
+
+.ojama-preview.player-b {
+  justify-content: flex-end;
+}
+
+/* アニメーション：おじゃまが追加されたとき */
+.ojama-preview.updated {
+  animation: ojama-flash 0.5s ease-in-out;
+}
+
+@keyframes ojama-flash {
+  0%, 100% {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    background: rgba(255, 100, 100, 0.3);
+    box-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
+  }
+}
+
+/* 大量のおじゃまぷよ警告 */
+.ojama-preview.danger {
+  background: rgba(255, 50, 50, 0.2);
+  border-color: rgba(255, 50, 50, 0.5);
+  animation: danger-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes danger-pulse {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 50, 50, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(255, 50, 50, 0.8);
+  }
+}

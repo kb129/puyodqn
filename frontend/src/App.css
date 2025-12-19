@@ -1,0 +1,285 @@
+.app {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ゲーム画面共通 */
+.game-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  padding: 1rem;
+}
+
+.game-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.game-header h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.score, .scores {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.scores {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+}
+
+/* シングルゲーム */
+.single-game .game-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+/* 対戦ゲーム */
+.versus-content {
+  display: flex;
+  gap: 4rem;
+  align-items: flex-start;
+}
+
+.player-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ojama-preview {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  min-height: 1.5rem;
+}
+
+.board-and-next {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+/* ネクスト表示 */
+.next-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.next-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.next-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #ddd;
+}
+
+.next-puyo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px;
+  border-radius: 4px;
+  width: 30px;
+  height: 62px;
+}
+
+.puyo {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.puyo-0 { background: #f8f8f8; } /* EMPTY */
+.puyo-1 { background: #ff6b6b; color: white; } /* RED */
+.puyo-2 { background: #4ecdc4; color: white; } /* BLUE */
+.puyo-3 { background: #95e1d3; color: white; } /* GREEN */
+.puyo-4 { background: #fce38a; color: #333; } /* YELLOW */
+.puyo-5 { background: #9e9e9e; color: white; } /* OJAMA */
+
+/* ボタン */
+.pause-button {
+  margin-top: 2rem;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pause-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ポーズ・ゲームオーバー画面 */
+.pause-screen, .gameover-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.pause-menu, .gameover-menu {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  color: #333;
+}
+
+.pause-menu h2, .gameover-menu h2 {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.menu-button {
+  display: block;
+  width: 100%;
+  margin: 1rem 0;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: linear-gradient(45deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+  background: linear-gradient(45deg, #5CBF60, #55b059);
+  transform: translateY(-2px);
+}
+
+.game-instructions {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #ddd;
+}
+
+.game-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chain-counter {
+  background: linear-gradient(145deg, #ff6b6b, #e55a5a);
+  color: white;
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  animation: chain-pulse 0.5s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+  position: relative;
+}
+
+.chain-counter::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff6b6b, #ffc107, #4caf50, #2196f3);
+  border-radius: 22px;
+  z-index: -1;
+  animation: chain-rainbow 2s ease-in-out infinite;
+}
+
+@keyframes chain-rainbow {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+@keyframes chain-pulse {
+  0% { 
+    transform: scale(1); 
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+  }
+  50% { 
+    transform: scale(1.15); 
+    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.8);
+  }
+  100% { 
+    transform: scale(1); 
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+  }
+}
+
+.board-chaining {
+  animation: chain-flash 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes chain-flash {
+  0% { 
+    filter: brightness(1); 
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+  100% { 
+    filter: brightness(1.2); 
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+  }
+}
+
+.versus-score {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+}
+
+.player-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vs-divider {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ff6b6b;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.chain-info {
+  font-size: 0.8rem;
+  color: #ffeb3b;
+  font-weight: bold;
+}
