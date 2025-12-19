@@ -180,6 +180,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+
+
   pauseGame: () => {
     const { appState } = get();
     if (appState === AppState.GAME_SINGLE || appState === AppState.GAME_VERSUS) {
@@ -206,6 +208,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
         winner
       } : null
     }));
+  },
+
+  // 新しいぷよペアを生成
+  generateNewPuyo: (playerId: "A" | "B") => {
+    const { gameState } = get();
+    if (!gameState) return;
+
+    const player = gameState.players[playerId];
+    if (!player) return;
+
+    // Nextを更新
+    const [nextPuyo, ...remainingNext] = player.nextPuyos;
+    const colors = [Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW];
+    const newNext: PuyoPair = {
+      colors: [
+        colors[Math.floor(Math.random() * colors.length)],
+        colors[Math.floor(Math.random() * colors.length)]
+      ],
+      x: 2,
+      y: 0,
+      rotation: 0
+    };
+
+    // 新しいツモを設定
+    player.fallingPuyo = {
+      colors: nextPuyo.colors,
+      x: 2,
+      y: 1, // 初期位置
+      rotation: 0
+    };
+
+    // Nextリストを更新
+    player.nextPuyos = [...remainingNext, newNext];
+
+    // ゲームオーバー判定
+    if (isGameOver(player.board, player.fallingPuyo)) {
+      gameState.gameOver = true;
+      gameState.winner = playerId === "A" ? "B" : "A";
+      set({ appState: AppState.GAME_OVER, gameState: { ...gameState } });
+      return;
+    }
+
+    set({ gameState: { ...gameState } });
   },
 
   resetGame: () => {
@@ -436,6 +481,9 @@ function continueChain(gameState: GameState, playerId: "A" | "B") {
     player.isChaining = false;
     console.log(`Chain ended for player ${playerId}, isChaining set to false`);
     
+    // 対戦モードでは、おじゃまぷよは相手の次のぷよ着地時に降る
+    // ここでは即座に降らせない
+    
     // 状態更新して自動落下タイマー再開を促す
     const { gameState: currentState } = useGameStore.getState();
     if (currentState) {
@@ -577,25 +625,13 @@ function calculateChainScore(group: Array<[number, number]>, chainCount: number)
   return Math.floor(baseScore * totalBonus);
 }
 
-// おじゃまぷよ送信処理
-function sendOjamaPuyos(gameState: GameState, targetPlayerId: "A" | "B") {
-  const targetPlayer = gameState.players[targetPlayerId];
-  
-  if (!targetPlayer || targetPlayer.ojamaPending === 0) return;
-  
-  // 待機中のおじゃまぷよを実際に配置
-  const ojamaCount = targetPlayer.ojamaPending;
-  targetPlayer.ojamaPending = 0;
-  
-  // 自分の盤面におじゃまぷよを配置
-  dropOjamaPuyos(targetPlayer.board, ojamaCount);
-}
+
 
 // おじゃまぷよ落下処理
 function dropOjamaPuyos(board: Color[][], count: number) {
   let remaining = count;
   
-  // 上から順に配置
+  // 上から順に配置（1行目から開始、0行目は隠し段）
   for (let y = 1; y < 13 && remaining > 0; y++) {
     for (let x = 0; x < 6 && remaining > 0; x++) {
       if (board[y][x] === Color.EMPTY) {
@@ -612,6 +648,21 @@ function dropOjamaPuyos(board: Color[][], count: number) {
 function landPuyo(gameState: GameState, playerId: "A" | "B") {
   const player = gameState.players[playerId];
   if (!player || !player.fallingPuyo) return;
+
+  // まず相手のおじゃまぷよがあれば降らせる（着地直後に降る）
+  if (gameState.mode === 'versus') {
+    if (player.ojamaPending > 0) {
+      dropOjamaPuyos(player.board, player.ojamaPending);
+      player.ojamaPending = 0;
+      
+      // おじゃま落下後のゲームオーバー判定（簡易チェック）
+      if (player.board[0][2] !== Color.EMPTY || player.board[0][3] !== Color.EMPTY) {
+        gameState.gameOver = true;
+        gameState.winner = playerId === "A" ? "B" : "A";
+        return;
+      }
+    }
+  }
 
   const positions = getPuyoPositions(player.fallingPuyo);
   const separatedPuyos: Array<{x: number, y: number, color: Color}> = [];
@@ -649,11 +700,6 @@ function landPuyo(gameState: GameState, playerId: "A" | "B") {
   // 連鎖判定処理
   processChains(gameState, playerId);
 
-  // おじゃまぷよ送信処理
-  if (gameState.mode === 'versus') {
-    sendOjamaPuyos(gameState, playerId);
-  }
-
   // 新しいぷよペア生成
   player.fallingPuyo = player.nextPuyos.shift() || null;
   
@@ -673,14 +719,43 @@ function landPuyo(gameState: GameState, playerId: "A" | "B") {
   // ゲームオーバーチェック（新しいぷよが配置できないか）
   if (player.fallingPuyo) {
     const newPuyoPositions = getPuyoPositions(player.fallingPuyo);
+    let canPlace = true;
+    
     for (const [x, y] of newPuyoPositions) {
-      if (y <= 1 && (x === 2 || x === 3) && player.board[y][x] !== Color.EMPTY) {
-        gameState.gameOver = true;
-        if (gameState.mode === "versus") {
-          gameState.winner = playerId === "A" ? "B" : "A";
+      if (y >= 0 && y < 13 && x >= 0 && x < 6) {
+        if (player.board[y][x] !== Color.EMPTY) {
+          canPlace = false;
+          break;
         }
-        return;
+      }
+    }
+    
+    if (!canPlace) {
+      gameState.gameOver = true;
+      if (gameState.mode === "versus") {
+        gameState.winner = playerId === "A" ? "B" : "A";
+      }
+      return;
+    }
+  }
+}
+
+// ゲームオーバー判定
+function isGameOver(board: Color[][], fallingPuyo: PuyoPair): boolean {
+  // 13段目（隠し段）の中央2列に既にぷよがあるかチェック
+  if (board[0][2] !== Color.EMPTY || board[0][3] !== Color.EMPTY) {
+    return true;
+  }
+
+  // 新しいぷよが初期位置に置けるかチェック
+  const positions = getPuyoPositions(fallingPuyo);
+  for (const [x, y] of positions) {
+    if (y >= 0 && y < 13 && x >= 0 && x < 6) {
+      if (board[y][x] !== Color.EMPTY) {
+        return true;
       }
     }
   }
+
+  return false;
 }

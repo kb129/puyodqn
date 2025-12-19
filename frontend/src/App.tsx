@@ -140,8 +140,12 @@ function App() {
           <div className="pause-screen">
             <div className="pause-menu">
               <h2>PAUSED</h2>
-              <button className="menu-button">ゲームを続ける</button>
-              <button className="menu-button">メインメニューに戻る</button>
+              <button className="menu-button" onClick={() => useGameStore.getState().resumeGame()}>
+                ゲームを続ける
+              </button>
+              <button className="menu-button" onClick={() => useGameStore.getState().setAppState(AppState.MAIN_MENU)}>
+                メインメニューに戻る
+              </button>
             </div>
           </div>
         );
@@ -154,8 +158,12 @@ function App() {
               {gameState?.winner && (
                 <p>Winner: Player {gameState.winner}</p>
               )}
-              <button className="menu-button">リトライ</button>
-              <button className="menu-button">メインメニューに戻る</button>
+              <button className="menu-button" onClick={() => useGameStore.getState().resetGame()}>
+                リトライ
+              </button>
+              <button className="menu-button" onClick={() => useGameStore.getState().setAppState(AppState.MAIN_MENU)}>
+                メインメニューに戻る
+              </button>
             </div>
           </div>
         );

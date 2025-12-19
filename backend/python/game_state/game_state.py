@@ -154,6 +154,18 @@ class GameState:
         if not player or not player.current_puyo:
             return False
         
+        # 着地時におじゃまぷよを適用
+        if self.mode == 'versus' and player.ojama_pending > 0:
+            player.board.add_ojama(player.ojama_pending)
+            player.ojama_pending = 0
+            
+            # ゲームオーバーチェック
+            if player.board.check_gameover():
+                self.game_over = True
+                other_id = 'B' if player_id == 'A' else 'A'
+                self.winner = other_id
+                return False
+        
         # 盤面に配置
         if not player.board.place_puyo_pair(player.current_puyo):
             # 配置失敗（ゲームオーバー）
