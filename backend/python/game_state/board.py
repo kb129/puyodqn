@@ -129,13 +129,17 @@ class Board:
         return -1  # 列が満杯
     
     def add_ojama(self, count: int):
-        """おじゃまぷよを追加"""
+        """おじゃまぷよを追加（最大5段まで）"""
         if count <= 0:
-            return
+            return 0
+        
+        # 最大5段分（30個）まで制限
+        max_drop = 5 * BOARD_WIDTH  # 5段 × 6列 = 30個
+        actual_drop = min(count, max_drop)
         
         # 各列に均等分配
-        per_column = count // BOARD_WIDTH
-        remainder = count % BOARD_WIDTH
+        per_column = actual_drop // BOARD_WIDTH
+        remainder = actual_drop % BOARD_WIDTH
         
         for x in range(BOARD_WIDTH):
             ojama_for_this_column = per_column
@@ -147,6 +151,9 @@ class Board:
                 drop_y = self.get_drop_position(x)
                 if drop_y >= 0:
                     self.set_puyo(x, drop_y, Color.OJAMA)
+        
+        # 降らせた分を返す
+        return actual_drop
     
     def to_list(self) -> List[List[int]]:
         """盤面を2次元リストとして返す"""

@@ -656,12 +656,16 @@ function calculateChainScore(group: Array<[number, number]>, chainCount: number)
 
 
 
-// おじゃまぷよ落下処理
+// おじゃまぷよ落下処理（最大5段まで）
 function dropOjamaPuyos(board: Color[][], count: number) {
-  let remaining = count;
+  // 最大5段分（30個）まで制限
+  const maxDrop = 5 * 6; // 5段 × 6列 = 30個
+  const actualDrop = Math.min(count, maxDrop);
   
-  // 上から順に配置（1行目から開始、0行目は隠し段）
-  for (let y = 1; y < 13 && remaining > 0; y++) {
+  let remaining = actualDrop;
+  
+  // 下から順に配置するように変更
+  for (let y = 12; y >= 1 && remaining > 0; y--) {
     for (let x = 0; x < 6 && remaining > 0; x++) {
       if (board[y][x] === Color.EMPTY) {
         board[y][x] = Color.OJAMA;
@@ -672,17 +676,19 @@ function dropOjamaPuyos(board: Color[][], count: number) {
   
   // 重力適用
   applyFullGravity(board);
+  
+  return actualDrop;
 }
 
 function landPuyo(gameState: GameState, playerId: "A" | "B") {
   const player = gameState.players[playerId];
   if (!player || !player.fallingPuyo) return;
 
-  // まず相手のおじゃまぷよがあれば降らせる（着地直後に降る）
+  // まず相手のおじゃまぷよがあれば降らせる（着地直後に降る、5段分まで）
   if (gameState.mode === 'versus') {
     if (player.ojamaPending > 0) {
-      dropOjamaPuyos(player.board, player.ojamaPending);
-      player.ojamaPending = 0;
+      const dropped = dropOjamaPuyos(player.board, player.ojamaPending);
+      player.ojamaPending = Math.max(0, player.ojamaPending - dropped);
       
       // おじゃま落下後のゲームオーバー判定（簡易チェック）
       if (player.board[0][2] !== Color.EMPTY || player.board[0][3] !== Color.EMPTY) {

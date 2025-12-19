@@ -154,18 +154,6 @@ class GameState:
         if not player or not player.current_puyo:
             return False
         
-        # 着地時におじゃまぷよを適用
-        if self.mode == 'versus' and player.ojama_pending > 0:
-            player.board.add_ojama(player.ojama_pending)
-            player.ojama_pending = 0
-            
-            # ゲームオーバーチェック
-            if player.board.check_gameover():
-                self.game_over = True
-                other_id = 'B' if player_id == 'A' else 'A'
-                self.winner = other_id
-                return False
-        
         # 盤面に配置
         if not player.board.place_puyo_pair(player.current_puyo):
             # 配置失敗（ゲームオーバー）
@@ -174,6 +162,22 @@ class GameState:
                 other_id = 'B' if player_id == 'A' else 'A'
                 self.winner = other_id
             return False
+        
+        # 着地後におじゃまぷよを適用（5段分ずつ）
+        if self.mode == 'versus' and player.ojama_pending > 0:
+            # 5段分（30個）を上限として降らせる
+            max_drop_per_landing = 5 * BOARD_WIDTH  # 5段 × 6列 = 30個
+            drop_amount = min(player.ojama_pending, max_drop_per_landing)
+            
+            dropped = player.board.add_ojama(drop_amount)
+            player.ojama_pending = max(0, player.ojama_pending - dropped)
+            
+            # おじゃまぷよ配置後のゲームオーバーチェック
+            if player.board.check_gameover():
+                self.game_over = True
+                other_id = 'B' if player_id == 'A' else 'A'
+                self.winner = other_id
+                return False
         
         # 次のぷよペア準備
         player.current_puyo = player.next_puyos.pop(0)
@@ -277,13 +281,17 @@ class GameState:
         return total_removed + self._process_chain(player_id)
     
     def apply_pending_ojama(self, player_id: str):
-        """待機中のおじゃまぷよを適用"""
+        """待機中のおじゃまぷよを適用（5段分ずつ）"""
         player = self.get_player(player_id)
         if not player or player.ojama_pending <= 0:
             return
         
-        player.board.add_ojama(player.ojama_pending)
-        player.ojama_pending = 0
+        # 5段分（30個）を上限として降らせる
+        max_drop_per_apply = 5 * BOARD_WIDTH  # 5段 × 6列 = 30個
+        drop_amount = min(player.ojama_pending, max_drop_per_apply)
+        
+        dropped = player.board.add_ojama(drop_amount)
+        player.ojama_pending = max(0, player.ojama_pending - dropped)
         
         # ゲームオーバーチェック
         if player.board.check_gameover():
