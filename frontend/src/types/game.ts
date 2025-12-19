@@ -72,6 +72,7 @@ export interface PlayerState {
   isChaining: boolean;
   chainCount: number;
   ojamaPending: number;
+  lastRotationTime?: { type: 'left' | 'right', timestamp: number };
 }
 
 // ゲーム状態

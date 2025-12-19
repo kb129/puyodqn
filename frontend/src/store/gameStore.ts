@@ -39,7 +39,8 @@ const createInitialPlayer = (id: "A" | "B", type: PlayerType): PlayerState => ({
   score: 0,
   isChaining: false,
   chainCount: 0,
-  ojamaPending: 0
+  ojamaPending: 0,
+  lastRotationTime: undefined
 });
 
 const createInitialGameState = (mode: "single" | "versus", playerAType: PlayerType, playerBType: PlayerType): GameState => ({
@@ -124,6 +125,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       case "rotate_left":
         const newRotationL = (puyo.rotation - 1 + 4) % 4;
+        const currentTime = Date.now();
+        
         if (canRotateWithKick(player.board, puyo, newRotationL)) {
           const kickResult = tryRotationWithKick(player.board, puyo, newRotationL);
           if (kickResult) {
@@ -132,10 +135,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             puyo.y = kickResult.y;
             updated = true;
           }
+        } else {
+          // 回転不可の場合、ダブル入力チェック
+          if (player.lastRotationTime && 
+              player.lastRotationTime.type === 'left' &&
+              currentTime - player.lastRotationTime.timestamp <= 500) {
+            // 500ms以内の同じ回転入力 - 上下入れ替え
+            [puyo.colors[0], puyo.colors[1]] = [puyo.colors[1], puyo.colors[0]];
+            updated = true;
+          }
         }
+        
+        player.lastRotationTime = { type: 'left', timestamp: currentTime };
         break;
       case "rotate_right":
         const newRotationR = (puyo.rotation + 1) % 4;
+        const currentTimeR = Date.now();
+        
         if (canRotateWithKick(player.board, puyo, newRotationR)) {
           const kickResult = tryRotationWithKick(player.board, puyo, newRotationR);
           if (kickResult) {
@@ -144,7 +160,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             puyo.y = kickResult.y;
             updated = true;
           }
+        } else {
+          // 回転不可の場合、ダブル入力チェック
+          if (player.lastRotationTime && 
+              player.lastRotationTime.type === 'right' &&
+              currentTimeR - player.lastRotationTime.timestamp <= 500) {
+            // 500ms以内の同じ回転入力 - 上下入れ替え
+            [puyo.colors[0], puyo.colors[1]] = [puyo.colors[1], puyo.colors[0]];
+            updated = true;
+          }
         }
+        
+        player.lastRotationTime = { type: 'right', timestamp: currentTimeR };
         break;
       case "soft_drop":
         if (canMove(player.board, puyo, 0, 1)) {
@@ -458,7 +485,7 @@ function continueChain(gameState: GameState, playerId: "A" | "B") {
     
     // おじゃまぷよ計算（対戦モード）
     if (gameState.mode === 'versus' && chainScore > 0) {
-      const ojamaCount = Math.floor(chainScore / 70);
+      const ojamaCount = Math.floor(chainScore / 70); // 70点で1個
       if (ojamaCount > 0) {
         const otherId = playerId === 'A' ? 'B' : 'A';
         const otherPlayer = gameState.players[otherId];
@@ -600,29 +627,31 @@ function removePuyos(board: Color[][], positions: Array<[number, number]>) {
   }
 }
 
-// スコア計算（簡易版）
+// スコア計算（仕様書準拠）
 function calculateChainScore(group: Array<[number, number]>, chainCount: number): number {
-  // 標準的なぷよぷよスコア計算
   const puyoCount = group.length;
   
   // 基本点 = 消した個数 × 10
   const baseScore = puyoCount * 10;
   
-  // 連鎖ボーナス
+  // 連鎖ボーナステーブル（仕様書準拠）
   const chainBonusTable = [0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512];
-  const chainBonus = chainBonusTable[Math.min(chainCount - 1, 18)] || 512;
+  const chainBonus = chainCount > 1 ? chainBonusTable[Math.min(chainCount - 1, chainBonusTable.length - 1)] || 512 : 0;
   
-  // 色数ボーナス（簡易版）
-  const colorBonus = 0; // 今回は簡略化
+  // 連結ボーナステーブル（仕様書準拠）
+  // 4個=0, 5個=2, 6個=3, 7個=4, 8個=5, 9個=6, 10個=7, 11個以上=10
+  const countBonusTable = [0, 2, 3, 4, 5, 6, 7, 10];
+  const countBonus = puyoCount >= 4 ? (countBonusTable[Math.min(puyoCount - 4, 7)] ?? 10) : 0;
   
-  // 個数ボーナス
-  const countBonusTable = [0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 10];
-  const countBonus = countBonusTable[Math.min(puyoCount, 10)] || 10;
+  // 多色ボーナス（簡易版：1色なので0）
+  const colorBonus = 0;
   
-  // 総ボーナス
-  const totalBonus = Math.max(1, (chainBonus + colorBonus + countBonus) / 10);
+  // 仕様書の計算式：基本点 × (連鎖ボーナス + 多色ボーナス + 連結ボーナス)
+  // ただし最小倍率は1（ボーナス合計が0でも基本点は保証）
+  const totalBonus = Math.max(1, chainBonus + colorBonus + countBonus);
   
-  return Math.floor(baseScore * totalBonus);
+  // 最終スコア
+  return baseScore * totalBonus;
 }
 
 
