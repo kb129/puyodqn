@@ -48,8 +48,14 @@
   border: 2px solid #ddd;
   border-radius: 6px;
   background: white;
+  color: #333;
   cursor: pointer;
   transition: border-color 0.3s ease;
+}
+
+.player-dropdown option {
+  color: #333;
+  background: white;
 }
 
 .player-dropdown:focus {
